@@ -1,15 +1,28 @@
-name: CPP_CI
+name: CPP_CI_With_Telegram
+
 on: [push]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Build
         run: g++ main.cpp -o app_test
 
       - name: Test
         run: ./app_test
+
+      # Реальное уведомление в Telegram (Задание 3)
+      - name: Send Telegram Notification
+        if: always() # Отправит даже если тесты упали
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            Репозиторий: ${{ github.repository }}
+            Статус сборки: ${{ job.status }}
+            Автор: ${{ github.actor }}
+            Проверить: https://github.com/${{ github.repository }}/actions
